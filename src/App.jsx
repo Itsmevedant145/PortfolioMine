@@ -4,11 +4,17 @@ import Practcie from './Practcie';
 import ResumeBuilder from './ResumeBuilder';
 
 
+
+
 function App() {
  return (
+  <>
 <JuniorDeveloperPortfolio/>
    // <Practcie />
   // <ResumeBuilder />
+
+
+   </>
  )
 }
 
