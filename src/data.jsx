@@ -23,30 +23,34 @@ export const projects = [
   {
     title: 'Finance Tracker',
     description: 'Full stack app to track income and expenses...',
+    features: [
+      'Add, edit, and delete transactions',
+      'Visualize spending patterns with charts',
+      'User authentication and data security',
+    ],
     tech: ['JavaScript', 'Node.js', 'Express', 'MongoDB', 'HTML5', 'CSS3'],
     color: 'from-green-500 to-emerald-500',
     type: 'Full Stack Project',
     github: 'https://github.com/Itsmevedant145/Finance-Tracker-',
-    live: 'https://finance-tracker-frontend-s41f.onrender.com'
+    live: 'https://finance-tracker-frontend-s41f.onrender.com',
+    image: '/public/images/finance-tracker.jpg' // Add your image path here
   },
   {
     title: 'Habit & Goal Manager',
     description: 'Full stack habit and goal-setting app...',
+    features: [
+      'Daily habit tracking with streaks',
+      'Progress visualization dashboard',
+      'Goal reminders and analytics',
+    ],
     tech: ['JavaScript', 'Node.js', 'Express', 'MongoDB', 'HTML5', 'CSS3'],
     color: 'from-blue-500 to-indigo-500',
     type: 'Full Stack Project',
     github: 'https://github.com/Itsmevedant145/HABIT-AND-GOAL-MANAGER',
-    live: 'https://habit-and-goal-manager-frontned.onrender.com'
+    live: 'https://habit-and-goal-manager-frontned.onrender.com',
+    image: '/public/images/habit-manager.jpg'
   },
-  {
-    title: 'Basic E-commerce CRUD',
-    description: 'Full stack product management app...',
-    tech: ['JavaScript', 'Node.js', 'Express', 'MongoDB', 'HTML5', 'CSS3'],
-    color: 'from-orange-500 to-red-500',
-    type: 'Full Stack Project',
-    github: 'https://github.com/Itsmevedant145/Web-Project'
-    // ⛔ No live key here = no button will show
-  }
+
 ];
 
 
