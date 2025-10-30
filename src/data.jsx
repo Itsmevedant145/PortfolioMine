@@ -33,7 +33,7 @@ export const projects = [
     type: 'Full Stack Project',
     github: 'https://github.com/Itsmevedant145/Finance-Tracker-',
     live: 'https://finance-tracker-frontend-s41f.onrender.com',
-    image: '/public/images/finance-tracker.jpg' // Add your image path here
+    image: '/images/finance-tracker.jpg' // ✅ Correct path
   },
   {
     title: 'Habit & Goal Manager',
@@ -48,10 +48,10 @@ export const projects = [
     type: 'Full Stack Project',
     github: 'https://github.com/Itsmevedant145/HABIT-AND-GOAL-MANAGER',
     live: 'https://habit-and-goal-manager-frontned.onrender.com',
-    image: '/public/images/habit-manager.jpg'
+    image: '/images/habit-manager.jpg' // ✅ Correct path
   },
-
 ];
+
 
 
 export const education = [
