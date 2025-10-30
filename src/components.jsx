@@ -159,11 +159,7 @@ export const HeroSection = ({ isLoaded, scrollToSection }) => (
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-6">
-          <button className="group px-10 py-4 bg-gradient-to-r from-red-800 to-red-700 text-white rounded-full font-bold hover:shadow-[0_0_25px_rgba(185,28,28,0.5)] transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 flex items-center justify-center gap-3 relative overflow-hidden">
-            <span className="absolute inset-0 bg-gradient-to-r from-red-700 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            <Download size={22} className="relative z-10 group-hover:animate-bounce" />
-            <span className="relative z-10">Download Resume</span>
-          </button>
+          
 
           <button
             onClick={() => scrollToSection("projects")}
