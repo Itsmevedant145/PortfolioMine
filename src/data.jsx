@@ -7,16 +7,20 @@ import {
   FaJava,
   FaDatabase,
   FaNodeJs,
+  FaPython,
 } from 'react-icons/fa';
 
 export const skills = [
-  { name: 'JavaScript', icon: <FaJs className="text-yellow-500" />, level: 85 },
+  { name: 'JavaScript', icon: <FaJs className="text-yellow-500" />, level: 70 },
   { name: 'React', icon: <FaReact className="text-cyan-500" />, level: 80 },
   { name: 'HTML5', icon: <FaHtml5 className="text-orange-600" />, level: 90 },
   { name: 'CSS3', icon: <FaCss3Alt className="text-blue-500" />, level: 85 },
   { name: 'Java', icon: <FaJava className="text-red-600" />, level: 70 },
-  { name: 'SQL', icon: <FaDatabase className="text-gray-700" />, level: 65 },
-  { name: 'Node.js', icon: <FaNodeJs className="text-green-600" />, level: 50, learning: true },
+  { name: 'SQL', icon: <FaDatabase className="text-gray-700" />, level: 70 },
+  { name: 'Node.js', icon: <FaNodeJs className="text-green-600" />, level: 60, learning: true },
+  { name: 'Express.js', icon: <FaNodeJs className="text-green-600" />, level: 60, learning: true },
+  { name: 'MongoDB', icon: <FaDatabase className="text-green-700" />, level: 50, learning: true },
+  { name : 'Python ', icon: <FaPython className="text-yellow-700" />, level: 60  },
 ];
 
 export const projects = [
