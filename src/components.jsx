@@ -1,288 +1,529 @@
-// components.js - Reusable components
+// components.js - Reusable components (Glassmorphism Redesign)
 import React from 'react';
 import { useEffect, useState } from "react";
-import { ChevronDown, Mail, Github, Linkedin, MapPin, Phone, Download, Code, Sparkles, Zap, Rocket,ExternalLink,Code2, ArrowRight } from 'lucide-react';
+import { ChevronDown, Mail, Github, Linkedin, MapPin, Phone, Code, Sparkles, Zap, Rocket, ExternalLink, ArrowRight, Palette } from 'lucide-react';
 import { skills, projects, achievements, personalInfo } from './data.jsx';
+import { useMemo } from "react";
 
-// Navigation Component with glassmorphism
-export const Navigation = ({ activeSection, scrollToSection, isLoaded }) => (
-  <nav
-    className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
-      isLoaded ? 'translate-y-0' : '-translate-y-full'
-    }`}
-  >
-    <div className="backdrop-blur-xl bg-gradient-to-r from-black/90 via-neutral-900/80 to-red-950/70 border-b border-red-600/40 shadow-[0_0_15px_rgba(255,0,0,0.15)]">
-      <div className="max-w-6xl group mx-auto px-6 py-4">
-        <div className="flex justify-between items-center">
-          {/* Logo / Name */}
-         <div className="relative text-2xl font-bold text-red-500">
-  <span
-    className="inline-block bg-gradient-to-r from-red-600 via-gray-100 to-red-500 bg-clip-text text-transparent 
-               transition-all duration-300 hover:scale-110 hover:brightness-125"
-  >
-    {personalInfo.name}
-  </span>
+// ─── THEME SYSTEM ────────────────────────────────────────────────────────────
+export const themes = {
+  red: {
+    name: 'Crimson',
+    dot: 'bg-red-500',
+    primary: 'red-500',
+    primaryHex: '#ef4444',
+    accent: 'red-600',
+    accentHex: '#dc2626',
+    deep: 'red-900',
+    glow: 'rgba(239,68,68,0.35)',
+    glowSoft: 'rgba(239,68,68,0.12)',
+    gradFrom: 'from-red-500',
+    gradTo: 'to-red-700',
+    gradVia: 'via-red-600',
+    border: 'border-red-500/30',
+    borderHover: 'hover:border-red-500',
+    text: 'text-red-500',
+    textAccent: 'text-red-400',
+    bg: 'bg-red-600',
+    bgHover: 'hover:bg-red-700',
+    bgSoft: 'bg-red-600/10',
+    bgDeep: 'bg-red-950/40',
+    shadow: 'shadow-red-500/30',
+    shadowGlow: '[0_0_40px_rgba(239,68,68,0.25)]',
+  },
+  blue: {
+    name: 'Cyber Blue',
+    dot: 'bg-cyan-400',
+    primary: 'cyan-400',
+    primaryHex: '#22d3ee',
+    accent: 'cyan-500',
+    accentHex: '#06b6d4',
+    deep: 'cyan-900',
+    glow: 'rgba(34,211,238,0.35)',
+    glowSoft: 'rgba(34,211,238,0.12)',
+    gradFrom: 'from-cyan-400',
+    gradTo: 'to-blue-600',
+    gradVia: 'via-cyan-500',
+    border: 'border-cyan-400/30',
+    borderHover: 'hover:border-cyan-400',
+    text: 'text-cyan-400',
+    textAccent: 'text-cyan-300',
+    bg: 'bg-cyan-500',
+    bgHover: 'hover:bg-cyan-600',
+    bgSoft: 'bg-cyan-500/10',
+    bgDeep: 'bg-cyan-950/40',
+    shadow: 'shadow-cyan-400/30',
+    shadowGlow: '[0_0_40px_rgba(34,211,238,0.25)]',
+  },
+  green: {
+    name: 'Emerald',
+    dot: 'bg-emerald-400',
+    primary: 'emerald-400',
+    primaryHex: '#34d399',
+    accent: 'emerald-500',
+    accentHex: '#10b981',
+    deep: 'emerald-900',
+    glow: 'rgba(52,211,153,0.35)',
+    glowSoft: 'rgba(52,211,153,0.12)',
+    gradFrom: 'from-emerald-400',
+    gradTo: 'to-green-600',
+    gradVia: 'via-emerald-500',
+    border: 'border-emerald-400/30',
+    borderHover: 'hover:border-emerald-400',
+    text: 'text-emerald-400',
+    textAccent: 'text-emerald-300',
+    bg: 'bg-emerald-500',
+    bgHover: 'hover:bg-emerald-600',
+    bgSoft: 'bg-emerald-500/10',
+    bgDeep: 'bg-emerald-950/40',
+    shadow: 'shadow-emerald-400/30',
+    shadowGlow: '[0_0_40px_rgba(52,211,153,0.25)]',
+  },
+  purple: {
+    name: 'Violet',
+    dot: 'bg-violet-500',
+    primary: 'violet-500',
+    primaryHex: '#8b5cf6',
+    accent: 'violet-600',
+    accentHex: '#7c3aed',
+    deep: 'violet-900',
+    glow: 'rgba(139,92,246,0.35)',
+    glowSoft: 'rgba(139,92,246,0.12)',
+    gradFrom: 'from-violet-500',
+    gradTo: 'to-purple-700',
+    gradVia: 'via-violet-600',
+    border: 'border-violet-500/30',
+    borderHover: 'hover:border-violet-500',
+    text: 'text-violet-400',
+    textAccent: 'text-violet-300',
+    bg: 'bg-violet-600',
+    bgHover: 'hover:bg-violet-700',
+    bgSoft: 'bg-violet-600/10',
+    bgDeep: 'bg-violet-950/40',
+    shadow: 'shadow-violet-500/30',
+    shadowGlow: '[0_0_40px_rgba(139,92,246,0.25)]',
+  },
+};
 
-  {/* Subtle glow ring */}
-  <span className="absolute inset-0 -z-10 blur-md opacity-0 hover:opacity-70 transition-opacity duration-500 bg-red-600/40 rounded-md"></span>
-</div>
+// ─── THEME SWITCHER ──────────────────────────────────────────────────────────
+export const ThemeSwitcher = ({ currentTheme, setTheme }) => {
+  const [open, setOpen] = useState(false);
+  const t = themes[currentTheme];
 
+  return (
+    <div className="relative">
+      {/* Options */}
+      <div className={`absolute bottom-16 right-0 transition-all duration-300 ${open ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+        <div
+          className="backdrop-blur-2xl rounded-2xl p-3 border flex flex-col gap-2 min-w-[160px]"
+          style={{
+            background: 'rgba(10,10,10,0.85)',
+            borderColor: t.primaryHex + '44',
+            boxShadow: `0 8px 40px ${t.glow}`,
+          }}
+        >
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-widest px-2 pb-1">Theme</p>
+          {Object.entries(themes).map(([key, th]) => (
+            <button
+              key={key}
+              onClick={() => { setTheme(key); setOpen(false); }}
+              className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                currentTheme === key ? 'text-white' : 'text-gray-400 hover:text-white'
+              }`}
+              style={{
+                background: currentTheme === key ? th.primaryHex + '22' : 'transparent',
+                border: currentTheme === key ? `1px solid ${th.primaryHex}66` : '1px solid transparent',
+              }}
+            >
+              <span className={`w-3 h-3 rounded-full ${th.dot} shadow-lg`} style={{ boxShadow: `0 0 8px ${th.primaryHex}` }} />
+              {th.name}
+            </button>
+          ))}
+        </div>
+      </div>
 
-          {/* Navigation links */}
-          <div className="hidden md:flex space-x-1">
-            {['hero', 'about', 'skills', 'projects', 'contact'].map((section) => (
-              <button
-                key={section}
-                onClick={() => scrollToSection(section)}
-                className={`capitalize px-5 py-2 rounded-full transition-all duration-300 font-medium relative overflow-hidden group tracking-wide ${
-                  activeSection === section
-                    ? 'text-white bg-gradient-to-r from-red-700 to-red-900 shadow-[0_0_10px_rgba(255,0,0,0.4)]'
-                    : 'text-gray-300 hover:text-white'
-                }`}
-              >
-                <span className="relative z-10">{section}</span>
+      {/* Toggle Button */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-14 h-14 rounded-2xl flex items-center justify-center backdrop-blur-2xl border transition-all duration-300 hover:scale-110"
+        style={{
+          background: `rgba(10,10,10,0.8)`,
+          borderColor: t.primaryHex + '55',
+          boxShadow: `0 0 25px ${t.glow}, inset 0 1px 0 rgba(255,255,255,0.08)`,
+        }}
+      >
+        <Palette size={22} style={{ color: t.primaryHex }} />
+      </button>
+    </div>
+  );
+};
 
-                {/* Hover red glow */}
-                {activeSection !== section && (
-                  <span className="absolute inset-0 bg-gradient-to-r from-red-700/20 to-red-900/20 scale-0 group-hover:scale-100 transition-transform duration-300 rounded-full"></span>
-                )}
-              </button>
-            ))}
+// ─── FLOATING PARTICLES ──────────────────────────────────────────────────────
+export const FloatingParticles = ({ theme }) => {
+  const t = themes[theme] || themes.red;
+  const particles = useMemo(() => {
+    return [...Array(35)].map((_, i) => ({
+      id: i,
+      isAccent: Math.random() > 0.5,
+      size: Math.random() * 4 + 1.5,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: Math.random() * 22 + 14,
+      delay: Math.random() * 10,
+      drift: Math.random() * 40 - 20,
+    }));
+  }, []);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          className="absolute rounded-full will-change-transform"
+          style={{
+            width: p.size,
+            height: p.size,
+            left: `${p.left}%`,
+            top: `${p.top}%`,
+            background: p.isAccent ? t.primaryHex : 'rgba(255,255,255,0.08)',
+            opacity: p.isAccent ? 0.35 : 0.15,
+            boxShadow: p.isAccent ? `0 0 12px ${t.primaryHex}` : 'none',
+            filter: `blur(${p.isAccent ? 0.5 : 1}px)`,
+            animation: `floatParticle ${p.duration}s ease-in-out infinite`,
+            animationDelay: `${p.delay}s`,
+            '--drift': `${p.drift}px`,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+export const Navigation = ({ activeSection, scrollToSection, isLoaded, theme }) => {
+  const t = themes[theme] || themes.red;
+  const sections = ['hero', 'about', 'skills', 'projects', 'contact'];
+
+  return (
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-out ${
+        isLoaded ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+      }`}
+    >
+      <div
+        className="relative border-b"
+        style={{
+          background: 'rgba(5,5,5,0.75)',
+          backdropFilter: 'blur(24px)',
+          borderColor: t.primaryHex + '22',
+          boxShadow: `0 1px 0 ${t.primaryHex}22, 0 10px 40px rgba(0,0,0,0.5)`,
+        }}
+      >
+        {/* Bottom glow line */}
+        <div
+          className="absolute bottom-0 left-0 w-full h-[1px] animate-pulse"
+          style={{ background: `linear-gradient(90deg, transparent, ${t.primaryHex}60, transparent)` }}
+        />
+
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="flex justify-center items-center">
+            <div
+              className="relative flex space-x-1 md:space-x-2 px-3 py-2 rounded-2xl border"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                backdropFilter: 'blur(12px)',
+                borderColor: 'rgba(255,255,255,0.08)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+              }}
+            >
+              {sections.map((section) => {
+                const isActive = activeSection === section;
+                return (
+                  <button
+                    key={section}
+                    onClick={() => scrollToSection(section)}
+                    className="relative px-5 py-2 text-sm font-medium capitalize tracking-wide rounded-xl transition-all duration-300 group"
+                    style={{ color: isActive ? '#fff' : 'rgba(156,163,175,1)' }}
+                  >
+                    {isActive && (
+                      <span
+                        className="absolute inset-0 rounded-xl transition-all duration-500"
+                        style={{
+                          background: `linear-gradient(135deg, ${t.primaryHex}, #ffffff)`,
+                          boxShadow: `0 0 20px ${t.glow}`,
+                        }}
+                      />
+                    )}
+                    {!isActive && (
+                      <span
+                        className="absolute inset-0 rounded-xl scale-0 group-hover:scale-100 transition-transform duration-300"
+                        style={{ background: t.primaryHex + '15' }}
+                      />
+                    )}
+                    <span className="relative z-10">{section}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </nav>
-);
+    </nav>
+  );
+};
 
+// ─── HERO ─────────────────────────────────────────────────────────────────────
+export const HeroSection = ({ isLoaded, scrollToSection, theme }) => {
+  const t = themes[theme] || themes.red;
 
-// Floating particles background effect
-const FloatingParticles = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    {[...Array(30)].map((_, i) => {
-      const isRed = Math.random() > 0.4;
-      const size = Math.random() * 6 + 1;
-
-      return (
-        <div
-          key={i}
-          className={`absolute rounded-full ${
-            isRed
-              ? 'bg-gradient-to-br from-red-500/30 to-red-600/20 shadow-red-500/50'
-              : 'bg-gradient-to-br from-gray-700/20 to-black/30'
-          }`}
-          style={{
-            width: size + 'px',
-            height: size + 'px',
-            left: Math.random() * 100 + '%',
-            top: Math.random() * 100 + '%',
-            animation: `float ${Math.random() * 15 + 10}s ease-in-out infinite`,
-            animationDelay: Math.random() * 5 + 's',
-            boxShadow: isRed ? '0 0 20px rgba(239, 68, 68, 0.3)' : 'none',
-            filter: isRed ? 'blur(0.5px)' : 'blur(1px)'
-          }}
-        />
-      );
-    })}
-  </div>
-);
-
-
-// Hero Section with dramatic effects
-export const HeroSection = ({ isLoaded, scrollToSection }) => (
-  <section
-    id="hero"
-    className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-black via-zinc-900 to-red-950/30"
-  >
-    {/* Subtle background particles */}
-    <FloatingParticles />
-
-    {/* Deep red gradient orbs for atmosphere */}
-    <div className="absolute top-20 left-10 w-80 h-80 bg-red-900/20 rounded-full blur-[120px] animate-pulse"></div>
-    <div
-      className="absolute bottom-20 right-10 w-[28rem] h-[28rem] bg-red-800/10 rounded-full blur-[100px] animate-pulse"
-      style={{ animationDelay: "1s" }}
-    ></div>
-
-    {/* Dark vignette overlay for cinematic focus */}
-    <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/80 pointer-events-none"></div>
-
-    {/* Hero Content */}
-    <div
-      className={`text-center relative z-10 transition-all duration-1000 ${
-        isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-      }`}
+  return (
+    <section
+      id="hero"
+      className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #000 0%, #0a0a0a 50%, #050505 100%)' }}
     >
-      <div className="mb-8">
-        {/* Sparkle Accent */}
-        <div className="flex justify-center mb-6">
-          <Sparkles
-            className="text-red-400/80 animate-spin-slow drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]"
-            size={32}
-          />
+      {/* Glass orbs */}
+      <div
+        className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full blur-[140px] animate-pulse"
+        style={{ background: t.primaryHex + '18' }}
+      />
+      <div
+        className="absolute bottom-1/4 left-1/4 w-[300px] h-[300px] rounded-full blur-[100px]"
+        style={{ background: t.primaryHex + '0d', animationDelay: '2s' }}
+      />
+
+      {/* Mesh grid overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(${t.primaryHex} 1px, transparent 1px), linear-gradient(90deg, ${t.primaryHex} 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+
+      <FloatingParticles theme={theme} />
+
+      <div
+        className={`text-center relative z-10 px-6 transition-all duration-1000 ${
+          isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
+        {/* Glass badge */}
+        <div
+          className="inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full border text-sm font-medium"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            backdropFilter: 'blur(16px)',
+            borderColor: t.primaryHex + '40',
+            color: t.primaryHex,
+            boxShadow: `0 0 20px ${t.glowSoft}`,
+          }}
+        >
+          <Sparkles size={15} className="animate-pulse" />
+          Available for opportunities
         </div>
 
-        <h1 className="text-6xl md:text-8xl font-black mb-6 bg-gradient-to-r from-red-400/90 via-red-600/80 to-red-800/70 bg-clip-text text-transparent animate-gradient drop-shadow-[0_0_20px_rgba(120,0,0,0.5)]">
-          Hi, I'm Vedant
+        <h1 className="text-7xl md:text-9xl font-black mb-4 tracking-tighter" style={{ color: '#fff' }}>
+          Hi, I'm{' '}
+          <span
+            style={{
+              background: `linear-gradient(135deg, ${t.primaryHex}, #ffffff)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              filter: `drop-shadow(0 0 30px ${t.glow})`,
+            }}
+          >
+            Vedant
+          </span>
         </h1>
 
-        <div className="relative inline-block mb-6">
-          <p className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400/80 to-red-600/70">
-            {personalInfo.title}
-          </p>
-          <div className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-red-600/60 to-transparent"></div>
-        </div>
+        <p className="text-2xl md:text-3xl text-zinc-400 mb-4 font-light tracking-wide">
+          {personalInfo.title}
+        </p>
 
-        <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed tracking-wide">
+        <p className="text-lg text-zinc-500 mb-12 max-w-2xl mx-auto leading-relaxed">
           {personalInfo.description}
         </p>
 
-        {/* Feature Badges */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          <span className="px-5 py-3 bg-gradient-to-r from-red-900/30 to-red-800/20 text-red-300/90 rounded-full text-sm font-semibold border border-red-700/40 backdrop-blur-sm hover:scale-110 transition-transform duration-300 flex items-center gap-2 shadow-lg shadow-red-900/30">
-            <Rocket size={18} className="animate-bounce" />
-            Quick Learner
-          </span>
-          <span className="px-5 py-3 bg-gradient-to-r from-zinc-800/70 to-black/40 text-gray-300 rounded-full text-sm font-semibold border border-red-700/30 backdrop-blur-sm hover:scale-110 transition-transform duration-300 flex items-center gap-2 shadow-lg shadow-red-900/20">
-            <Zap size={18} className="animate-pulse" />
-            Problem Solver
-          </span>
-          <span className="px-5 py-3 bg-gradient-to-r from-red-700/20 to-black/30 text-red-300/90 rounded-full text-sm font-semibold border border-red-700/30 backdrop-blur-sm hover:scale-110 transition-transform duration-300 flex items-center gap-2 shadow-lg shadow-red-900/20">
-            <Sparkles
-              size={18}
-              className="animate-spin-slow"
-              style={{ animationDuration: "3s" }}
-            />
-            Passionate Coder
-          </span>
+        {/* Glass pills */}
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
+          {[
+            { icon: <Rocket size={15} />, label: 'Quick Learner' },
+            { icon: <Zap size={15} />, label: 'Problem Solver' },
+            { icon: <Sparkles size={15} />, label: 'Passionate Coder' },
+          ].map(({ icon, label }) => (
+            <span
+              key={label}
+              className="px-5 py-2.5 text-sm font-medium rounded-full flex items-center gap-2 transition-all duration-300 hover:scale-105"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                backdropFilter: 'blur(12px)',
+                border: `1px solid rgba(255,255,255,0.1)`,
+                color: 'rgba(209,213,219,1)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+              }}
+            >
+              <span style={{ color: t.primaryHex }}>{icon}</span>
+              {label}
+            </span>
+          ))}
         </div>
 
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row justify-center gap-6">
-          
-
-          <button
-            onClick={() => scrollToSection("projects")}
-            className="group px-10 py-4 border-2 border-red-600/70 text-red-400/90 rounded-full font-bold hover:bg-red-800 hover:text-white hover:border-red-800 transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 flex items-center justify-center gap-3 backdrop-blur-sm relative overflow-hidden"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-red-800 to-black scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full"></span>
-            <Code
-              size={22}
-              className="relative z-10 group-hover:rotate-12 transition-transform duration-300"
-            />
-            <span className="relative z-10">View My Work</span>
-          </button>
-        </div>
+        {/* CTA Button */}
+        <button
+          onClick={() => scrollToSection('projects')}
+          className="group px-10 py-4 font-bold rounded-2xl transition-all duration-300 inline-flex items-center gap-3 hover:gap-4 hover:scale-105"
+          style={{
+            background: `linear-gradient(135deg, ${t.primaryHex}, #ffffff)`,
+            color: '#fff',
+            boxShadow: `0 8px 40px ${t.glow}, inset 0 1px 0 rgba(255,255,255,0.2)`,
+          }}
+        >
+          <Code size={20} />
+          View My Work
+          <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+        </button>
       </div>
-    </div>
 
-    {/* Scroll indicator */}
-    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-      <div className="flex flex-col items-center gap-2 animate-bounce">
-        <span className="text-gray-400 text-sm font-medium tracking-widest">
-          SCROLL DOWN
-        </span>
+      <div
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 cursor-pointer group"
+        onClick={() => scrollToSection('about')}
+      >
         <ChevronDown
-          size={36}
-          className="text-red-400/80 cursor-pointer hover:text-red-300 transition-all hover:scale-125"
-          onClick={() => scrollToSection("about")}
+          size={30}
+          className="animate-bounce transition-colors"
+          style={{ color: 'rgba(82,82,82,1)' }}
         />
       </div>
-    </div>
+    </section>
+  );
+};
 
-    <style jsx>{`
-      @keyframes float {
-        0%, 100% { transform: translateY(0) translateX(0); }
-        50% { transform: translateY(-20px) translateX(20px); }
-      }
-      @keyframes gradient {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-      }
-      .animate-gradient {
-        background-size: 200% 200%;
-        animation: gradient 5s ease infinite;
-      }
-      .animate-spin-slow {
-        animation: spin 6s linear infinite;
-      }
-    `}</style>
-  </section>
-);
+// ─── ABOUT ───────────────────────────────────────────────────────────────────
+export const AboutSection = ({ theme }) => {
+  const t = themes[theme] || themes.red;
 
+  return (
+    <section id="about" className="relative py-28 overflow-hidden" style={{ background: '#050505' }}>
+      <div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[160px] pointer-events-none"
+        style={{ background: t.primaryHex + '14' }}
+      />
 
-// About Section with cards
-export const AboutSection = () => (
-  <section
-    id="about"
-    className="py-24 relative bg-gradient-to-b from-black via-zinc-900 to-red-950/30 overflow-hidden"
-  >
-    <FloatingParticles />
-    <div className="max-w-5xl mx-auto px-6 relative z-10">
-      <h2 className="text-5xl font-black text-center mb-6 bg-gradient-to-r from-red-400/80 to-red-600/70 bg-clip-text text-transparent">
-        About Me
-      </h2>
-      <div className="w-24 h-1 bg-gradient-to-r from-red-500/60 to-red-700/60 mx-auto mb-16 rounded-full"></div>
-
-      <div className="grid md:grid-cols-2 gap-8 mb-12">
-        <div className="group bg-gradient-to-br from-zinc-800/60 to-red-950/20 backdrop-blur-lg rounded-2xl p-8 border border-red-700/30 hover:border-red-500/60 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-red-800/20">
-          <div className="w-16 h-16 bg-gradient-to-br from-red-600/70 to-red-800/70 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
-            <Code className="text-white" size={32} />
-          </div>
-          <h3 className="text-2xl font-bold text-white mb-4">Fresh Perspective</h3>
-          <p className="text-gray-300 leading-relaxed">
-            I'm a recent computer science graduate with a genuine passion for web development.
-            While I may be new to the professional world, I bring enthusiasm, dedication, and
-            a strong foundation in programming fundamentals.
-          </p>
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
+        {/* Heading */}
+        <div className="text-center mb-20">
+          <h2
+            className="text-5xl md:text-6xl font-black tracking-tight"
+            style={{
+              background: `linear-gradient(135deg, ${t.primaryHex}, #ffffff)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            About Me
+          </h2>
+          <div
+            className="mt-5 w-28 h-[2px] mx-auto rounded-full"
+            style={{ background: `linear-gradient(90deg, transparent, ${t.primaryHex}, transparent)` }}
+          />
         </div>
 
-        <div className="group bg-gradient-to-br from-zinc-800/60 to-red-950/20 backdrop-blur-lg rounded-2xl p-8 border border-red-700/30 hover:border-red-500/60 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-red-800/20">
-          <div className="w-16 h-16 bg-gradient-to-br from-red-500/70 to-red-800/70 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
-            <Sparkles className="text-white" size={32} />
+        {/* Cards */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          {[
+            {
+              icon: <Code size={26} style={{ color: t.primaryHex }} />,
+              title: 'Fresh Perspective',
+              body: "I'm a recent computer science graduate with a strong passion for web development. I bring dedication, curiosity, and solid programming fundamentals to every project.",
+            },
+            {
+              icon: <Sparkles size={26} style={{ color: t.primaryHex }} />,
+              title: 'Always Learning',
+              body: "I enjoy transforming ideas into code and continuously improving my skills. I'm excited to grow within a collaborative and innovative team.",
+            },
+          ].map(({ icon, title, body }) => (
+            <div
+              key={title}
+              className="group rounded-3xl p-8 transition-all duration-500 hover:scale-[1.02]"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                backdropFilter: 'blur(20px)',
+                border: `1px solid rgba(255,255,255,0.07)`,
+                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05)`,
+              }}
+              onMouseEnter={e => e.currentTarget.style.boxShadow = `0 8px 40px ${t.glowSoft}, inset 0 1px 0 rgba(255,255,255,0.08)`}
+              onMouseLeave={e => e.currentTarget.style.boxShadow = `inset 0 1px 0 rgba(255,255,255,0.05)`}
+            >
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:rotate-6"
+                style={{
+                  background: t.primaryHex + '18',
+                  border: `1px solid ${t.primaryHex}30`,
+                }}
+              >
+                {icon}
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{title}</h3>
+              <p className="text-gray-400 leading-relaxed">{body}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Highlight */}
+        <div
+          className="rounded-3xl p-10 transition-all duration-500"
+          style={{
+            background: 'rgba(255,255,255,0.03)',
+            backdropFilter: 'blur(20px)',
+            border: `1px solid ${t.primaryHex}25`,
+            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
+          }}
+        >
+          <div className="flex gap-6 items-start">
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+              style={{ background: t.primaryHex + '18', border: `1px solid ${t.primaryHex}30` }}
+            >
+              <Rocket size={20} style={{ color: t.primaryHex }} />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-3">What I'm Looking For</h3>
+              <p className="text-gray-400 leading-relaxed text-lg">
+                A junior developer role where I can contribute to meaningful products, learn from experienced engineers, and continuously evolve my technical skills.
+              </p>
+            </div>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-4">Always Learning</h3>
-          <p className="text-gray-300 leading-relaxed">
-            I love turning ideas into code and am always excited to learn new technologies.
-            I'm looking for an opportunity to grow with a team that values learning and innovation.
-          </p>
+        </div>
+
+        {/* Pills */}
+        <div className="flex flex-wrap justify-center gap-5 mt-14">
+          {[
+            { icon: <MapPin size={16} style={{ color: t.primaryHex }} />, text: personalInfo.location },
+            { icon: <Phone size={16} style={{ color: t.primaryHex }} />, text: personalInfo.availability },
+          ].map(({ icon, text }) => (
+            <div
+              key={text}
+              className="flex items-center gap-3 px-6 py-3 rounded-full transition-all duration-300 hover:scale-105"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                backdropFilter: 'blur(12px)',
+                border: `1px solid rgba(255,255,255,0.08)`,
+              }}
+            >
+              {icon}
+              <span className="text-gray-300 font-medium">{text}</span>
+            </div>
+          ))}
         </div>
       </div>
+    </section>
+  );
+};
 
-      <div className="bg-gradient-to-r from-red-950/50 via-black/50 to-red-900/40 backdrop-blur-xl rounded-2xl p-8 border-2 border-red-700/40 shadow-2xl shadow-red-900/20 hover:shadow-red-800/40 transition-all duration-500 hover:scale-[1.02]">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-red-600/80 to-red-900/80 rounded-xl flex items-center justify-center flex-shrink-0 animate-pulse">
-            <Rocket className="text-white" size={24} />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400/80 to-red-600/70 mb-3">
-              What I'm Looking For
-            </h3>
-            <p className="text-gray-300 leading-relaxed text-lg">
-              A junior developer position where I can contribute to meaningful projects,
-              learn from experienced developers, and grow my skills in a collaborative environment.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap justify-center gap-8 mt-12">
-        <div className="flex items-center gap-3 bg-zinc-800/60 backdrop-blur-sm px-6 py-3 rounded-full border border-red-700/30 hover:border-red-500/50 transition-all duration-300 hover:scale-110">
-          <MapPin size={20} className="text-red-400/80" />
-          <span className="text-gray-200 font-medium">{personalInfo.location}</span>
-        </div>
-        <div className="flex items-center gap-3 bg-zinc-800/60 backdrop-blur-sm px-6 py-3 rounded-full border border-red-700/30 hover:border-red-500/50 transition-all duration-300 hover:scale-110">
-          <Phone size={20} className="text-red-400/80" />
-          <span className="text-gray-200 font-medium">{personalInfo.availability}</span>
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
-
-// Skills Section with hover effects
-export const SkillsSection = () => {
+// ─── SKILLS ──────────────────────────────────────────────────────────────────
+export const SkillsSection = ({ theme }) => {
+  const t = themes[theme] || themes.red;
   const [hovered, setHovered] = useState(null);
   const [progress, setProgress] = useState({});
 
@@ -290,12 +531,10 @@ export const SkillsSection = () => {
     if (hovered) {
       let value = 0;
       const skill = skills.find((s) => s.name === hovered);
+      if (!skill) return;
       const timer = setInterval(() => {
         value += 3;
-        setProgress((prev) => ({
-          ...prev,
-          [skill.name]: Math.min(value, skill.level),
-        }));
+        setProgress((prev) => ({ ...prev, [skill.name]: Math.min(value, skill.level) }));
         if (value >= skill.level) clearInterval(timer);
       }, 20);
       return () => clearInterval(timer);
@@ -305,20 +544,33 @@ export const SkillsSection = () => {
   return (
     <section
       id="skills"
-      className="py-32 bg-gradient-to-b from-black via-zinc-950 to-zinc-900 relative overflow-hidden"
+      className="py-32 relative overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #050505 0%, #080808 100%)' }}
     >
-      <FloatingParticles />
+      <FloatingParticles theme={theme} />
+
       <div className="max-w-7xl mx-auto px-8 relative z-10">
-        <h2 className="text-5xl font-black text-center mb-6 bg-gradient-to-r from-red-400 via-pink-400 to-purple-500 bg-clip-text text-transparent">
+        <h2
+          className="text-5xl font-black text-center mb-5"
+          style={{
+            background: `linear-gradient(135deg, ${t.primaryHex}, #ffffff)`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
           Skills & Technologies
         </h2>
-        <div className="w-24 h-1 bg-gradient-to-r from-red-400 to-pink-500 mx-auto mb-20 rounded-full"></div>
+        <div
+          className="w-24 h-1 mx-auto mb-20 rounded-full"
+          style={{ background: `linear-gradient(90deg, ${t.primaryHex}, ${t.accentHex})` }}
+        />
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-10">
-          {skills.map((skill, index) => {
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          {skills.map((skill) => {
             const level = progress[skill.name] || 0;
             const circumference = 2 * Math.PI * 45;
             const dashOffset = circumference - (level / 100) * circumference;
+            const isHov = hovered === skill.name;
 
             return (
               <div
@@ -327,57 +579,56 @@ export const SkillsSection = () => {
                 onMouseEnter={() => setHovered(skill.name)}
                 onMouseLeave={() => setHovered(null)}
               >
-                <div className="relative bg-gradient-to-br from-zinc-800/60 to-zinc-900/60 backdrop-blur-lg rounded-2xl p-6 border border-zinc-700/40 hover:border-cyan-400/60 transition-all duration-500 hover:scale-110 hover:shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:-translate-y-2 w-full aspect-square flex flex-col items-center justify-center overflow-hidden">
-                  
-                  {/* Circular progress only on hover */}
+                <div
+                  className="relative rounded-3xl p-5 border transition-all duration-500 hover:scale-110 hover:-translate-y-2 w-full aspect-square flex flex-col items-center justify-center overflow-hidden cursor-default"
+                  style={{
+                    background: isHov
+                      ? `rgba(255,255,255,0.07)`
+                      : 'rgba(255,255,255,0.03)',
+                    backdropFilter: 'blur(20px)',
+                    borderColor: isHov ? t.primaryHex + '55' : 'rgba(255,255,255,0.07)',
+                    boxShadow: isHov
+                      ? `0 8px 40px ${t.glowSoft}, inset 0 1px 0 rgba(255,255,255,0.1)`
+                      : 'inset 0 1px 0 rgba(255,255,255,0.04)',
+                  }}
+                >
+                  {/* Circular progress */}
                   <svg
-                    className={`absolute top-0 left-0 w-full h-full transition-opacity duration-500 ${
-                      hovered === skill.name ? "opacity-100" : "opacity-0"
-                    }`}
+                    className={`absolute top-0 left-0 w-full h-full transition-opacity duration-500 ${isHov ? 'opacity-100' : 'opacity-0'}`}
                     viewBox="0 0 100 100"
-                    style={{ transform: "rotate(-90deg)" }}
+                    style={{ transform: 'rotate(-90deg)' }}
                   >
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4" />
                     <circle
-                      cx="50"
-                      cy="50"
-                      r="45"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.15)"
-                      strokeWidth="5"
-                    />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="45"
-                      fill="none"
-                      stroke="rgb(34,211,238)"
-                      strokeWidth="5"
+                      cx="50" cy="50" r="45" fill="none"
+                      stroke={t.primaryHex}
+                      strokeWidth="4"
                       strokeDasharray={circumference}
                       strokeDashoffset={dashOffset}
                       strokeLinecap="round"
                       style={{
-                        transition: "stroke-dashoffset 1s ease-out",
-                        filter: "drop-shadow(0 0 8px rgba(34,211,238,0.6))",
+                        transition: 'stroke-dashoffset 1s ease-out',
+                        filter: `drop-shadow(0 0 6px ${t.primaryHex})`,
                       }}
                     />
                   </svg>
 
                   {/* Icon */}
                   {React.cloneElement(skill.icon, {
-                    size: 44,
-                    className:
-                      "text-cyan-300/90 group-hover:text-cyan-200 transition-all duration-300 group-hover:scale-125 relative z-10",
+                    size: 40,
+                    style: { color: isHov ? t.primaryHex : 'rgba(156,163,175,0.9)', transition: 'all 0.3s', position: 'relative', zIndex: 10 },
                   })}
 
-                  {/* Percentage only visible when hovered */}
-                  {hovered === skill.name && (
-                    <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-cyan-200 transition-all duration-300">
+                  {isHov && (
+                    <span
+                      className="absolute inset-0 flex items-center justify-center text-sm font-bold transition-all duration-300"
+                      style={{ color: t.primaryHex }}
+                    >
                       {Math.round(level)}%
                     </span>
                   )}
 
-                  {/* Skill name */}
-                  <span className="mt-16 text-sm font-semibold text-gray-300 group-hover:text-white transition-colors duration-300 text-center relative z-10">
+                  <span className="mt-14 text-xs font-semibold text-gray-400 group-hover:text-white transition-colors text-center relative z-10">
                     {skill.name}
                   </span>
                 </div>
@@ -389,340 +640,362 @@ export const SkillsSection = () => {
     </section>
   );
 };
-// Projects Section with 3D effect
-export const ProjectsSection = () => {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+
+// ─── PROJECTS ────────────────────────────────────────────────────────────────
+export const ProjectsSection = ({ theme }) => {
+  const t = themes[theme] || themes.red;
 
   return (
-    <section id="projects" className="py-32 bg-black relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        {/* Header */}
-        <div className="text-center mb-20">
-          <div className="inline-block mb-4">
-            <span className="px-4 py-2 bg-red-600/10 border border-red-600/20 rounded-full text-red-500 text-sm font-semibold">
-              Portfolio
+    <section id="projects" className="relative py-32 overflow-hidden" style={{ background: '#050505' }}>
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-full blur-[180px] pointer-events-none"
+        style={{ background: t.primaryHex + '0e' }}
+      />
+
+      <div className="max-w-4xl mx-auto px-6 relative z-10">
+        <div className="text-center mb-24">
+          <span
+            className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-6"
+            style={{
+              background: t.primaryHex + '15',
+              border: `1px solid ${t.primaryHex}30`,
+              color: t.primaryHex,
+            }}
+          >
+            Portfolio
+          </span>
+
+          <h2 className="text-5xl md:text-6xl font-extrabold text-white mb-6">
+            Featured{' '}
+            <span
+              style={{
+                background: `linear-gradient(135deg, ${t.primaryHex}, #ffffff)`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              Projects
             </span>
-          </div>
-          <h2 className="text-6xl md:text-7xl font-black mb-6 text-white">
-            Featured <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-800">Projects</span>
           </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Showcasing my journey in full-stack development with real-world applications
+
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+            Selected full-stack applications built with modern technologies and performance-focused architecture.
           </p>
         </div>
 
-        {/* Projects Grid */}
-        <div className="space-y-12">
+        <div className="space-y-32">
           {projects.map((project, index) => (
-            <div
-              key={index}
-              className="group relative cursor-pointer"
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              <div className="bg-black/50 border border-gray-800 rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-red-800/30">
-                <div className="grid md:grid-cols-2 gap-0">
-                  {/* Image */}
-                  <div className="relative h-[400px] md:h-[500px] overflow-hidden bg-gradient-to-br from-gray-900 to-black">
-                    {project.image && (
-                      <img
-                        src={project.image}
-                        alt={project.title}
-                        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 ${
-                          hoveredIndex === index ? 'scale-105' : 'scale-100'
-                        }`}
+            <div key={index} className="group transition-all duration-500">
+              {/* Image */}
+              <div
+                className="relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.01]"
+                style={{
+                  border: `1px solid rgba(255,255,255,0.07)`,
+                  background: 'rgba(255,255,255,0.02)',
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: `0 20px 80px rgba(0,0,0,0.5)`,
+                }}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = `0 20px 80px ${t.glowSoft}`}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 20px 80px rgba(0,0,0,0.5)'}
+              >
+                {project.image && (
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-[420px] object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                )}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: `linear-gradient(to top, ${t.primaryHex}22, transparent)` }}
+                />
+              </div>
+
+              {/* Content */}
+              <div className="mt-10">
+                <h3 className="text-3xl md:text-4xl font-bold text-white mb-6">{project.title}</h3>
+
+                <ul className="space-y-4 mb-8">
+                  {project.features.slice(0, 5).map((point, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <div
+                        className="mt-2 w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ background: t.primaryHex, boxShadow: `0 0 6px ${t.primaryHex}` }}
                       />
-                    )}
-                    {/* subtle overlay */}
-                    <div
-                      className={`absolute inset-0 bg-red-600/10 transition-opacity duration-500 ${
-                        hoveredIndex === index ? 'opacity-100' : 'opacity-0'
-                      }`}
-                    ></div>
-                  </div>
+                      <span className="text-gray-300 leading-relaxed">{point}</span>
+                    </li>
+                  ))}
+                </ul>
 
-                  {/* Content */}
-                  <div className="p-10 md:p-12 flex flex-col justify-between bg-gradient-to-br from-black to-gray-900">
-                    <div>
-                      <div className="flex items-center gap-3 mb-4">
-                        <Code2 className="text-red-500" size={20} />
-                        <span className="text-red-500 font-semibold text-sm tracking-wide uppercase">
-                          {project.type}
-                        </span>
-                      </div>
-                      <h3 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
-                        {project.title}
-                      </h3>
-                      <p className="text-gray-400 text-lg leading-relaxed mb-8">
-                        {project.description}
-                      </p>
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-10">
+                  {project.tech.map((tech, i) => (
+                    <span
+                      key={i}
+                      className="px-4 py-2 text-sm rounded-xl transition-all duration-300 hover:scale-105"
+                      style={{
+                        background: 'rgba(255,255,255,0.04)',
+                        backdropFilter: 'blur(8px)',
+                        border: `1px solid rgba(255,255,255,0.08)`,
+                        color: 'rgba(156,163,175,1)',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = t.primaryHex + '55'; e.currentTarget.style.color = '#fff'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'rgba(156,163,175,1)'; }}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
 
-                      {/* Features */}
-                      <div className="mb-8">
-                        <h4 className="text-white font-bold text-sm tracking-wide uppercase mb-4 flex items-center gap-2">
-                          <Sparkles size={16} className="text-red-500" />
-                          Key Features:
-                        </h4>
-                        <div className="grid grid-cols-1 gap-3">
-                          {project.features.map((feature, fIndex) => (
-                            <div key={fIndex} className="flex items-center gap-3">
-                              <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
-                              <span className="text-gray-300">{feature}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Technologies */}
-                      <div className="mb-10">
-                        <h4 className="text-white font-bold text-sm tracking-wide uppercase mb-4">
-                          Technologies Used:
-                        </h4>
-                        <div className="flex flex-wrap gap-3">
-                          {project.tech.map((tech, techIndex) => (
-                            <span
-                              key={techIndex}
-                              className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg text-sm font-medium border border-gray-700 hover:border-red-600/50 hover:bg-gray-900 transition-all duration-300"
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-4 mt-4">
-                      {project.live && (
-                        <a
-                          href={project.live}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group/btn flex items-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-700 text-black rounded-xl font-bold transition-all duration-300 hover:gap-4 shadow-lg hover:shadow-red-800/50"
-                        >
-                          <ExternalLink size={20} />
-                          <span>View Project</span>
-                          <ArrowRight
-                            size={18}
-                            className="opacity-0 group-hover/btn:opacity-100 transition-opacity -ml-2"
-                          />
-                        </a>
-                      )}
-                      <a
-                        href={project.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group/btn flex items-center gap-3 px-8 py-4 bg-gray-800 hover:bg-gray-900 text-white rounded-xl font-bold border border-gray-700 hover:border-red-600/50 transition-all duration-300 hover:gap-4"
-                      >
-                        <Github size={20} />
-                        <span>Source Code</span>
-                        <ArrowRight
-                          size={18}
-                          className="opacity-0 group-hover/btn:opacity-100 transition-opacity -ml-2"
-                        />
-                      </a>
-                    </div>
-                  </div>
+                {/* Buttons */}
+                <div className="flex flex-wrap gap-4">
+                  {project.live && (
+                    <a
+                      href={project.live}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/btn inline-flex items-center gap-3 px-7 py-3 rounded-2xl font-semibold transition-all duration-300 hover:scale-105"
+                      style={{
+                        background: `linear-gradient(135deg, ${t.primaryHex}, #ffffff)`,
+                        color: '#fff',
+                        boxShadow: `0 4px 20px ${t.glow}`,
+                      }}
+                    >
+                      <ExternalLink size={17} />
+                      Live Project
+                      <ArrowRight size={15} className="transition-transform group-hover/btn:translate-x-1" />
+                    </a>
+                  )}
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group/btn inline-flex items-center gap-3 px-7 py-3 rounded-2xl font-semibold transition-all duration-300 hover:scale-105"
+                    style={{
+                      background: 'rgba(255,255,255,0.04)',
+                      backdropFilter: 'blur(12px)',
+                      border: `1px solid rgba(255,255,255,0.1)`,
+                      color: '#fff',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = t.primaryHex + '55'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
+                  >
+                    <Github size={17} />
+                    GitHub
+                    <ArrowRight size={15} className="transition-transform group-hover/btn:translate-x-1" />
+                  </a>
                 </div>
               </div>
             </div>
           ))}
-
-          {/* Coming Soon Card */}
-          <div className="mt-16">
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-black rounded-3xl opacity-20 group-hover:opacity-30 blur transition-all duration-500"></div>
-              <div className="relative bg-black rounded-3xl p-12 border border-gray-800 transition-all duration-500">
-                <div className="flex items-start gap-6">
-                  <div className="p-4 bg-red-600/10 rounded-2xl">
-                    <Sparkles className="text-red-500" size={32} />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-3xl font-black text-white mb-3">
-                      More Amazing Projects Coming Soon!
-                    </h3>
-                    <p className="text-gray-400 text-lg leading-relaxed">
-                      Currently working on exciting new full-stack applications. Each project pushes my skills further and helps me grow as a developer. Stay tuned for updates! 🚀
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </section>
   );
 };
 
+// ─── CONTACT ─────────────────────────────────────────────────────────────────
+export const ContactSection = ({ theme }) => {
+  const t = themes[theme] || themes.red;
 
+  return (
+    <section id="contact" className="py-28 relative overflow-hidden" style={{ background: '#050505' }}>
+      <div
+        className="absolute inset-0"
+        style={{ background: `radial-gradient(ellipse at 50% 100%, ${t.primaryHex}12 0%, transparent 70%)` }}
+      />
+      <FloatingParticles theme={theme} />
 
-// Contact Section with animated cards
-export const ContactSection = () => (
-  <section
-    id="contact"
-    className="py-24 relative bg-gradient-to-b from-black via-neutral-900 to-red-950 overflow-hidden"
-  >
-    <FloatingParticles />
-    <div className="max-w-6xl mx-auto px-6 relative z-10">
-      <h2 className="text-5xl font-black text-center mb-6 bg-gradient-to-r from-red-600 via-red-500 to-gray-200 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(255,0,0,0.4)]">
-        Let's Connect!
-      </h2>
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <h2
+          className="text-5xl font-black text-center mb-5"
+          style={{
+            background: `linear-gradient(135deg, ${t.primaryHex}, #ffffff)`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          Let's Connect!
+        </h2>
+        <div
+          className="w-24 h-1 mx-auto mb-16 rounded-full"
+          style={{ background: `linear-gradient(90deg, ${t.primaryHex}, transparent)` }}
+        />
 
-      <div className="w-24 h-1 bg-gradient-to-r from-red-600 to-gray-700 mx-auto mb-16 rounded-full shadow-lg shadow-red-600/40"></div>
-
-      <div className="grid md:grid-cols-2 gap-12 items-center">
-        {/* Left card */}
-        <div className="space-y-8">
-          <div className="bg-gradient-to-br from-neutral-900/90 to-red-950/40 backdrop-blur-lg rounded-2xl p-8 border border-red-600/30 hover:border-red-500 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-red-600/30">
-            <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-gray-300 mb-4">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          {/* Left */}
+          <div
+            className="rounded-3xl p-8 transition-all duration-500 hover:scale-[1.01]"
+            style={{
+              background: 'rgba(255,255,255,0.03)',
+              backdropFilter: 'blur(24px)',
+              border: `1px solid ${t.primaryHex}25`,
+              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05)`,
+            }}
+          >
+            <h3
+              className="text-3xl font-black mb-4"
+              style={{
+                background: `linear-gradient(135deg, ${t.primaryHex}, #ffffff)`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
               Ready to start my career journey!
             </h3>
-
-            <p className="text-lg text-gray-300 leading-relaxed mb-6">
-              I'm excited to find the right opportunity where I can contribute fresh ideas, 
-              learn from experienced professionals, and grow into a valuable team member.
+            <p className="text-gray-300 leading-relaxed mb-6">
+              I'm excited to find the right opportunity where I can contribute fresh ideas, learn from experienced professionals, and grow into a valuable team member.
             </p>
 
-            <div className="bg-gradient-to-r from-red-950/80 to-black/80 backdrop-blur-sm rounded-xl p-6 border-l-4 border-red-600 shadow-lg">
-              <h4 className="font-bold text-red-400 mb-4 text-lg flex items-center gap-2">
-                <Rocket className="animate-bounce" size={20} />
+            <div
+              className="rounded-2xl p-6"
+              style={{
+                background: 'rgba(255,255,255,0.02)',
+                backdropFilter: 'blur(12px)',
+                borderLeft: `3px solid ${t.primaryHex}`,
+                border: `1px solid ${t.primaryHex}20`,
+              }}
+            >
+              <h4 className="font-bold mb-4 text-lg flex items-center gap-2" style={{ color: t.primaryHex }}>
+                <Rocket className="animate-bounce" size={18} />
                 Available for:
               </h4>
-              <ul className="text-red-200 space-y-2">
-                {[
-                  'Full-time junior developer positions',
-                  'Internships and entry-level roles',
-                  'Remote or on-site opportunities',
-                  'Open to relocation',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+              <ul className="space-y-2">
+                {['Full-time junior developer positions', 'Internships and entry-level roles', 'Remote or on-site opportunities', 'Open to relocation'].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-gray-300">
+                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: t.primaryHex }} />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-        </div>
 
-        {/* Right contact grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {[
-            {
-              href: `mailto:${personalInfo.email}`,
-              icon: <Mail className="text-red-400" size={28} />,
-              title: "Email",
-              subtitle: personalInfo.email,
-              gradient: "from-black/90 to-red-950/40",
-              border: "border-red-600/30",
-              hoverBorder: "hover:border-red-500"
-            },
-            {
-              href: personalInfo.linkedin,
-              icon: <Linkedin className="text-red-500" size={28} />,
-              title: "LinkedIn",
-              subtitle: "Connect with me",
-              gradient: "from-black/90 to-neutral-800/60",
-              border: "border-red-600/30",
-              hoverBorder: "hover:border-red-500"
-            },
-            {
-              href: personalInfo.github,
-              icon: <Github className="text-gray-200" size={28} />,
-              title: "GitHub",
-              subtitle: "View my code",
-              gradient: "from-neutral-900/90 to-black/70",
-              border: "border-gray-700/30",
-              hoverBorder: "hover:border-red-400"
-            },
-            {
-              icon: <Phone className="text-red-400" size={28} />,
-              title: "Phone",
-              subtitle: personalInfo.phone,
-              gradient: "from-black/80 to-red-950/60",
-              border: "border-red-600/30",
-              hoverBorder: "hover:border-red-500"
-            }
-          ].map(({ href, icon, title, subtitle, gradient, border, hoverBorder }) =>
-            href ? (
-              <a
-                key={title}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`group flex items-center gap-4 bg-gradient-to-br ${gradient} backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-red-600/30 hover:scale-110 transition-all duration-500 border ${border} ${hoverBorder}`}
-              >
-                <div className="group-hover:scale-125 group-hover:rotate-12 transition-transform duration-300">
-                  {icon}
-                </div>
-                <div>
-                  <div className="font-bold text-white text-lg">{title}</div>
-                  <div className="text-sm text-gray-400 group-hover:text-gray-200 transition-colors">
-                    {subtitle}
+          {/* Right grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              { href: `mailto:${personalInfo.email}`, icon: <Mail size={26} />, title: 'Email', subtitle: personalInfo.email },
+              { href: personalInfo.linkedin, icon: <Linkedin size={26} />, title: 'LinkedIn', subtitle: 'Connect with me' },
+              { href: personalInfo.github, icon: <Github size={26} />, title: 'GitHub', subtitle: 'View my code' },
+              { icon: <Phone size={26} />, title: 'Phone', subtitle: personalInfo.phone },
+            ].map(({ href, icon, title, subtitle }) => {
+              const inner = (
+                <div
+                  className="flex items-center gap-4 rounded-2xl p-6 transition-all duration-300"
+                  style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    backdropFilter: 'blur(20px)',
+                    border: `1px solid rgba(255,255,255,0.07)`,
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = t.primaryHex + '44';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.boxShadow = `0 8px 30px ${t.glowSoft}`;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.04)';
+                  }}
+                >
+                  <div style={{ color: t.primaryHex }}>{icon}</div>
+                  <div>
+                    <div className="font-bold text-white">{title}</div>
+                    <div className="text-sm text-gray-400">{subtitle}</div>
                   </div>
                 </div>
-              </a>
-            ) : (
-              <div
-                key={title}
-                className={`flex items-center gap-4 bg-gradient-to-br ${gradient} backdrop-blur-lg rounded-2xl p-6 shadow-lg border ${border}`}
-              >
-                {icon}
-                <div>
-                  <div className="font-bold text-white text-lg">{title}</div>
-                  <div className="text-sm text-gray-400">{subtitle}</div>
-                </div>
-              </div>
-            )
-          )}
+              );
+
+              return href ? (
+                <a key={title} href={href} target="_blank" rel="noopener noreferrer">{inner}</a>
+              ) : (
+                <div key={title}>{inner}</div>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
+// ─── FOOTER ──────────────────────────────────────────────────────────────────
+export const Footer = ({ theme }) => {
+  const t = themes[theme] || themes.red;
 
-// Footer Component
-export const Footer = () => (
-  <footer className="relative py-12 bg-gradient-to-b from-gray-900 to-black border-t border-blue-500/30 overflow-hidden">
-    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-blue-500/5"></div>
-    <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
-      <div className="mb-6">
-        <div className="text-3xl font-black bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent mb-2">
-          {personalInfo.name}
-        </div>
-        <p className="text-gray-400 text-lg font-medium">
-          Aspiring Developer • Open to Opportunities
-        </p>
-      </div>
-      
-      <div className="flex justify-center gap-6 mb-6">
-        {[
-          { href: personalInfo.github, icon: <Github size={24} />, label: "GitHub" },
-          { href: personalInfo.linkedin, icon: <Linkedin size={24} />, label: "LinkedIn" },
-          { href: `mailto:${personalInfo.email}`, icon: <Mail size={24} />, label: "Email" }
-        ].map(({ href, icon, label }) => (
-          <a
-            key={label}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={label}
-            className="w-12 h-12 bg-gradient-to-br from-gray-800 to-gray-700 hover:from-blue-600 hover:to-purple-600 rounded-xl flex items-center justify-center text-gray-400 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/30 border border-gray-700 hover:border-blue-500"
+  return (
+    <footer
+      className="relative py-12 overflow-hidden"
+      style={{
+        background: '#030303',
+        borderTop: `1px solid rgba(255,255,255,0.06)`,
+      }}
+    >
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: `radial-gradient(ellipse at 50% 0%, ${t.primaryHex}0a, transparent 60%)` }}
+      />
+
+      <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
+        <div className="mb-6">
+          <div
+            className="text-3xl font-black mb-2"
+            style={{
+              background: `linear-gradient(135deg, ${t.primaryHex}, #ffffff)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
           >
-            {icon}
-          </a>
-        ))}
+            {personalInfo.name}
+          </div>
+          <p className="text-gray-500 font-medium">Aspiring Developer • Open to Opportunities</p>
+        </div>
+
+        <div className="flex justify-center gap-4 mb-8">
+          {[
+            { href: personalInfo.github, icon: <Github size={20} />, label: 'GitHub' },
+            { href: personalInfo.linkedin, icon: <Linkedin size={20} />, label: 'LinkedIn' },
+            { href: `mailto:${personalInfo.email}`, icon: <Mail size={20} />, label: 'Email' },
+          ].map(({ href, icon, label }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'rgba(107,114,128,1)',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = t.primaryHex + '22';
+                e.currentTarget.style.borderColor = t.primaryHex + '55';
+                e.currentTarget.style.color = t.primaryHex;
+                e.currentTarget.style.boxShadow = `0 0 16px ${t.glowSoft}`;
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                e.currentTarget.style.color = 'rgba(107,114,128,1)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              {icon}
+            </a>
+          ))}
+        </div>
+
+        <div className="text-sm text-gray-600 space-y-1">
+          <p>© 2024 {personalInfo.name}. All rights reserved.</p>
+          <p className="flex items-center justify-center gap-2">
+            Built with <span className="animate-pulse" style={{ color: t.primaryHex }}>♥</span> using React & Tailwind CSS
+          </p>
+        </div>
       </div>
-      
-      <div className="text-sm text-gray-500 space-y-1">
-        <p>© 2024 {personalInfo.name}. All rights reserved.</p>
-        <p className="flex items-center justify-center gap-2">
-          Built with <span className="text-red-500 animate-pulse">♥</span> using React & Tailwind CSS
-        </p>
-      </div>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};

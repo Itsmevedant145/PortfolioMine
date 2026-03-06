@@ -1,8 +1,13 @@
 import React from 'react';
 import JuniorDeveloperPortfolio from './JuniorDeveloperPortfolio';
+import { ThemeProvider } from './ThemeContext';
 
 function App() {
-  return <JuniorDeveloperPortfolio />;
+  return (
+    <ThemeProvider>
+      <JuniorDeveloperPortfolio />
+    </ThemeProvider>
+  );
 }
 
 export default App;

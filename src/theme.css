@@ -1,0 +1,41 @@
+/* theme.css */
+
+/* Light Theme (default) */
+:root {
+  --bg-primary: #fef3c7; /* golden background */
+  --bg-secondary: #d9f99d; /* greenish accent */
+  --bg-nav: linear-gradient(to right, #fef3c7, #d9f99d);
+  --text-primary: #065f46; /* dark green text */
+  --text-secondary: #134e4a; /* subtitle text */
+  --accent: #facc15; /* highlights, sparkles, orb */
+  --skill-bg: #fef3c7; /* skill badges */
+  --skill-text: #065f46;
+  --cta-bg: #facc15;
+  --cta-hover-bg: #eab308;
+  --hover-glow: rgba(34,197,94,0.8); /* green glow */
+  --orb-color: rgba(250,204,21,0.2);
+  --spark-color: #facc15;
+  --scroll-color: #a3e635;
+  --particle-primary: rgba(250,204,21,0.6);
+  --particle-secondary: rgba(34,197,94,0.4);
+}
+
+/* Dark Theme */
+.dark {
+  --bg-primary: #000000; /* black background */
+  --bg-secondary: #1f2937; /* dark gray secondary */
+  --bg-nav: linear-gradient(to right, #000000, #111827);
+  --text-primary: #ffffff;
+  --text-secondary: #d1d5db; /* light gray subtitle */
+  --accent: #ef4444; /* red accents */
+  --skill-bg: #1f2937;
+  --skill-text: #d1d5db;
+  --cta-bg: #ef4444;
+  --cta-hover-bg: #dc2626;
+  --hover-glow: rgba(255,0,0,0.8); /* red glow */
+  --orb-color: rgba(239,68,68,0.1);
+  --spark-color: #ef4444;
+  --scroll-color: #f87171;
+  --particle-primary: rgba(255,0,0,0.4);
+  --particle-secondary: rgba(0,0,0,0.2);
+}
